@@ -1,0 +1,27 @@
+---
+services:
+  radarr:
+    image: lscr.io/linuxserver/radarr:latest
+    container_name: radarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Etc/UTC
+    volumes:
+      - /home/opc/Docker/radarr/config:/config
+      - /mnt/storage/movies:/movies
+      - /mnt/storage/downloads:/downloads
+    ports:
+      - 7878:7878
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.radarr.rule=Host(`XXX.XXX.XX`)" # your sub-domain where bazarr will be hosted for exemple radarr.mysite.com
+      - "traefik.http.routers.radarr.entrypoints=websecure"
+      - "traefik.http.routers.radarr.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
