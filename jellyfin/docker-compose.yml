@@ -1,0 +1,35 @@
+---
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    environment:
+      - PUID=1000
+      - PGID=1000
+      - TZ=Etc/UTC
+      - JELLYFIN_PublishedServerUrl=https://jellyfin.mysite.com # change this 
+    volumes:
+      - /home/opc/Docker/jellyfin/config:/config
+      - /mnt/storage/tv:/data/tvshows
+      - /mnt/storage/movies:/data/movies
+      - /mnt/storage/cul:/data/cul
+    ports:
+      - 8096:8096
+      #- 8920:8920 #optional
+      #- 7359:7359/udp #optional
+      #- 1900:1900/udp #optional
+    restart: unless-stopped
+    expose:
+      - 8096
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.rule=Host(`XXX.XXX.XX`)" # your sub-domain where bazarr will be hosted for exemple jellyfin.mysite.com
+      - "traefik.http.routers.jellyfin.entrypoints=websecure"
+      - "traefik.http.routers.jellyfin.tls.certresolver=lets-encrypt"
+      - "traefik.http.services.jellyfin.loadbalancer.server.port=8096"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
