@@ -1,0 +1,26 @@
+---
+version: "2.1"
+services:
+  flaresolverr:
+    # DockerHub mirror flaresolverr/flaresolverr:latest
+    image: ghcr.io/flaresolverr/flaresolverr:latest
+    container_name: flaresolverr
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL:-info}
+      - LOG_HTML=${LOG_HTML:-false}
+      - CAPTCHA_SOLVER=${CAPTCHA_SOLVER:-none}
+      - TZ=Europe/London
+    ports:
+      - "${PORT:-8191}:8191"
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.flaresolverr.rule=Host(`XXXXX.XXXXX.XX`)" # your sub-domain where bazarr will be hosted for exemple flaresolverr.mysite.com
+      - "traefik.http.routers.flaresolverr.entrypoints=websecure"
+      - "traefik.http.routers.flaresolverr.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
