@@ -1,0 +1,21 @@
+---
+version: "3.5"
+services:
+  wizarr:
+    container_name: wizarr
+    image: ghcr.io/wizarrrr/wizarr:latest
+    ports:
+      - 5690:5690
+    volumes:
+      - /home/opc/Docker/wizarr/database:/data/database
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.wizarr.rule=Host(`XXXX.XXXX.XXX)" # your sub-domain where bazarr will be hosted for exemple wizarr.mysite.com
+      - "traefik.http.routers.wizarr.entrypoints=websecure"
+      - "traefik.http.routers.wizarr.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
