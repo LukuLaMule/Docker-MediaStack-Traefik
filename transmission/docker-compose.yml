@@ -1,0 +1,37 @@
+version: '3.3'
+services:
+    transmission-openvpn:
+        restart: unless-stopped
+        cap_add:
+            - NET_ADMIN
+        volumes:
+            - '/mnt/storage/downloads:/data'
+            - '/home/opc/Docker/vpn/config:/config'
+        environment:
+            - TRANSMISSION_WEB_HOME=/config/flood-for-transmission
+            - OPENVPN_PROVIDER=PROTONVPN
+            - OPENVPN_CONFIG=ch.protonvpn.udp
+            - OPENVPN_USERNAME=XXXXXXX
+            - OPENVPN_PASSWORD=XXXXXXX
+            - LOCAL_NETWORK=10.0.0.0/16
+        logging:
+            driver: json-file
+            options:
+                max-size: 10m
+        ports:
+            - '9091:9091'
+        image: haugene/transmission-openvpn
+        labels:
+            - "traefik.enable=true"
+            - "traefik.http.routers.transmission-openvpn.rule=Host(`XXX.XXX.XX)" # your sub-domain where bazarr will be hosted for exemple transmission.mysite.com
+            - "traefik.http.routers.transmission-openvpn.entrypoints=websecure"
+            - "traefik.http.routers.transmission-openvpn.tls.certresolver=lets-encrypt"
+            - "traefik.http.routers.transmission-openvpn.service=transmission-openvpn-svc"
+            - "traefik.http.services.transmission-openvpn-svc.loadbalancer.server.port=9091"
+            - "traefik.http.services.transmission-openvpn-svc.loadbalancer.server.scheme=http"
+        networks:
+            - web
+
+networks:
+  web:
+    external: true
