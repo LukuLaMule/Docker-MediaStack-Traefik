@@ -1,0 +1,27 @@
+---
+services:
+  sonarr:
+    image: lscr.io/linuxserver/sonarr:latest
+    container_name: sonarr
+    environment:
+      - PUID=0
+      - PGID=0
+      - TZ=Etc/UTC
+    volumes:
+      - /home/opc/Docker/sonarr/config:/config
+      - /mnt/storage/tv:/tv #optional
+      - /mnt/storage/downloads:/downloads #optional
+    ports:
+      - 8989:8989
+    restart: unless-stopped
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=Host(`XXXX.XXXX.XX`)" # your sub-domain where bazarr will be hosted for exemple sonarr.mysite.com
+      - "traefik.http.routers.sonarr.entrypoints=websecure"
+      - "traefik.http.routers.sonarr.tls.certresolver=lets-encrypt"
+    networks:
+      - web
+
+networks:
+  web:
+    external: true
